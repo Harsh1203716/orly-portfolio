@@ -227,8 +227,8 @@
     .topbar{backdrop-filter:none;}
     .ad-floats{display:none;}
     .ad-piece{animation:none;}
-    .ad-board{transform:none; padding-top:20px;}
-    .ad-board .sq img.pc{animation:none; transform:none; filter:none;}
+    .ad-board{transform:rotateX(55deg); animation:none; padding-top:20px;}
+    .ad-board .sq img.pc{animation:none; transform:rotateX(-55deg) translateZ(12px) scale(1.12); filter:none;}
     .ad-main{perspective:none;}
     section{content-visibility:auto;}
     .ribbon-track span{font-size:.85rem;}
@@ -242,6 +242,7 @@
   }
   @media (prefers-reduced-motion: reduce){
     .ad-floats{display:none;}
+    .ad-board{animation:none;}
     .ad-board .sq img.pc{animation:none;}
     .ad-piece{animation:none;}
     .ribbon-track{animation:none;}
@@ -271,8 +272,10 @@
   @keyframes adRise { from{ transform:translateY(0) rotate(0deg); } to{ transform:translateY(-130vh) rotate(360deg); } }
   .ad-mini { margin:14px auto 0; width:260px; max-width:78vw; }
   .ad-main { display:flex; gap:22px; align-items:center; justify-content:center; margin-top:12px; perspective:1000px; }
-  .ad-board { display:grid; grid-template-columns:repeat(8,1fr); width:min(70vw,300px); flex-shrink:0; border:2px solid var(--gold); border-radius:8px; overflow:hidden; transform:rotateX(55deg); transform-style:preserve-3d; box-shadow:0 24px 50px rgba(0,0,0,.65); padding-top:26px; }
-  .ad-board .sq { aspect-ratio:1; display:flex; align-items:flex-end; justify-content:center; overflow:visible; position:relative; }
+  .ad-board { display:grid; grid-template-columns:repeat(8,1fr); width:min(70vw,300px); flex-shrink:0; border:2px solid var(--gold); border-radius:8px; overflow:hidden; transform:rotateX(55deg); transform-style:preserve-3d; box-shadow:0 30px 60px rgba(0,0,0,.7), 0 6px 0 #5a4a1f, 0 8px 0 #3a3013; padding-top:26px; position:relative; animation:boardSway 9s ease-in-out infinite; }
+  @keyframes boardSway { 0%,100%{ transform:rotateX(53deg); } 50%{ transform:rotateX(57deg); } }
+  .ad-board::before { content:""; position:absolute; inset:0; z-index:30; pointer-events:none; background:linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,0) 45%); }
+  .ad-board .sq { aspect-ratio:1; display:flex; align-items:flex-end; justify-content:center; overflow:visible; position:relative; transform-style:preserve-3d; }
   .ad-board .sq:nth-child(-n+8){ z-index:1; } .ad-board .sq:nth-child(n+9):nth-child(-n+16){ z-index:2; }
   .ad-board .sq:nth-child(n+17):nth-child(-n+24){ z-index:3; } .ad-board .sq:nth-child(n+25):nth-child(-n+32){ z-index:4; }
   .ad-board .sq:nth-child(n+33):nth-child(-n+40){ z-index:5; } .ad-board .sq:nth-child(n+41):nth-child(-n+48){ z-index:6; }
@@ -280,11 +283,11 @@
   .ad-board .sq { aspect-ratio:1; display:flex; align-items:center; justify-content:center; font-size:clamp(1.05rem,4.6vw,1.6rem); line-height:1; }
   .ad-board .sq.light { background:#e9e2d0; }
   .ad-board .sq.dark { background:#4a3f28; }
-  .ad-board .sq img.pc { width:112%; height:138%; object-fit:contain; object-position:bottom; margin-top:-38%; animation:standBob 2.4s ease-in-out infinite; transform:rotateX(-55deg) scale(1.12); transform-origin:bottom center; }
+  .ad-board .sq img.pc { width:112%; height:138%; object-fit:contain; object-position:bottom; margin-top:-38%; animation:standBob 2.4s ease-in-out infinite; transform:rotateX(-55deg) translateZ(16px) scale(1.12); transform-origin:bottom center; }
   .ad-board .sq img.bp { filter:drop-shadow(0 12px 7px rgba(0,0,0,.7)) brightness(1.18) contrast(1.3); }
   .ad-board .sq img.wp { filter:drop-shadow(0 12px 7px rgba(0,0,0,.7)) sepia(.22) brightness(1.04) contrast(1.05); }
   .ad-board .sq img.wp { animation-delay:-1.2s; }
-  @keyframes standBob { 0%,100%{ transform:rotateX(-55deg) translateY(0) scale(1.12); } 50%{ transform:rotateX(-55deg) translateY(-7px) scale(1.18); } }
+  @keyframes standBob { 0%,100%{ transform:rotateX(-55deg) translateZ(16px) translateY(0) scale(1.12); } 50%{ transform:rotateX(-55deg) translateZ(24px) translateY(-7px) scale(1.18); } }
   .ad-board .sq.hint { outline:3px solid var(--gold); outline-offset:-3px; box-shadow:inset 0 0 14px rgba(201,162,39,.8); }
   .ad-right { max-width:300px; }
   @media(max-width:640px){ .ad-main{ flex-direction:column; gap:12px; } .ad-right{ max-width:100%; } }
