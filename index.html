@@ -140,6 +140,8 @@
   .psq.last { box-shadow:inset 0 0 0 3px rgba(201,162,39,.85); }
   .psq .dot { position:absolute; width:28%; height:28%; border-radius:50%; background:rgba(201,162,39,.8); pointer-events:none; }
   #puzzleMsg { min-height:26px; color:var(--gold); text-align:center; margin-top:10px; font-size:.95rem; }
+  #bestBanner { display:none; text-align:center; font-size:1.3rem; font-weight:700; color:var(--gold); margin-top:8px; animation:bestPop .5s ease; }
+  @keyframes bestPop { from{ transform:scale(.6); opacity:0; } to{ transform:scale(1); opacity:1; } }
   .puz-btns { display:flex; gap:10px; justify-content:center; margin-top:10px; flex-wrap:wrap; }
   .puz-btns button { padding:11px 22px; border-radius:6px; font-size:.92rem; cursor:pointer; border:1px solid var(--line); background:transparent; color:var(--text); touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
   .puz-btns button.solid { background:var(--gold); color:#111; border-color:var(--gold); font-weight:700; }
@@ -149,6 +151,13 @@
   #topTable th { color:var(--gold); font-weight:600; font-size:.75rem; letter-spacing:.1em; text-transform:uppercase; }
   #topTable td { color:var(--text); }
   #topTable tr.me td { color:var(--gold); font-weight:700; }
+  /* diary */
+  .diary-entry { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:22px 24px; margin-top:16px; }
+  .diary-entry small { color:var(--gold); font-size:.78rem; letter-spacing:.14em; text-transform:uppercase; }
+  .diary-entry h3 { color:var(--white); font-weight:400; font-size:1.25rem; margin:6px 0 8px; }
+  .diary-entry p { color:var(--muted); font-size:.95rem; }
+  .cheer-btn { margin-top:12px; background:transparent; border:1px solid var(--line); color:var(--text); border-radius:100px; padding:7px 18px; font-size:.88rem; cursor:pointer; touch-action:manipulation; }
+  .cheer-btn:hover { border-color:var(--gold); color:var(--gold); }
 
   .contact { text-align:center; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:48px 28px; margin-top:24px; }
   .contact h2 { font-size:2rem; font-weight:400; color:var(--white); }
@@ -318,7 +327,7 @@
 <div class="topbar">
   <div class="topbar-inner">
     <div class="brand"><b>ORLY CASTILLANO</b><small>Chess Player</small></div>
-    <div class="nav"><a href="#about">About</a><a href="#journey">Journey</a><a href="#lessons">Lessons</a><a href="#puzzles">Play</a><a href="#reviews">Reviews</a><a href="#share">Share</a><a href="#contact">Contact</a><a class="cta" href="#contact">Challenge Me</a></div>
+    <div class="nav"><a href="#about">About</a><a href="#journey">Journey</a><a href="#lessons">Lessons</a><a href="#puzzles">Play</a><a href="#diary">Diary</a><a href="#reviews">Reviews</a><a href="#share">Share</a><a href="#contact">Contact</a><a class="cta" href="#contact">Challenge Me</a></div>
   </div>
 </div>
 
@@ -384,7 +393,7 @@
   <section id="lessons">
     <div class="kicker">03 — Lessons</div>
     <div class="h2">3 videos that made me better</div>
-    <p class="lead">These are not mine — these are the lessons I actually study. Start with #1 if you are a beginner.</p>
+    <p class="lead">These are not mine — these are the lessons I actually study. Tap ▶ and it plays right here in the page.</p>
     <div class="video-grid">
       <div class="video-card">
         <div class="video-facade" data-video="r7WNog6y-UU"><img loading="lazy" decoding="async" src="https://i.ytimg.com/vi/r7WNog6y-UU/hqdefault.jpg" alt="Chess guide video"><button>▶</button></div>
@@ -417,6 +426,10 @@
       <div id="gateMsg" style="min-height:20px;font-size:.85rem;color:var(--gold);margin-top:8px;"></div>
     </div>
     <div id="gameBox" style="display:none;">
+      <div class="puz-btns" style="margin-bottom:4px;">
+        <button id="modeNormal" class="solid" onclick="setMode('normal')">Normal 10 Levels</button>
+        <button id="modeRush" onclick="setMode('rush')">⚡ Rush 60s</button>
+      </div>
       <div class="puzzle-top">
         <span class="pill">Player <b id="pillUser">-</b></span>
         <span class="pill">Level <b id="pillLevel">1/10</b></span>
@@ -427,9 +440,12 @@
       <div id="puzzleTitle"></div>
       <div id="puzzleBoard"></div>
       <div id="puzzleMsg"></div>
+      <div id="bestBanner">🎉 NEW BEST! 🎉</div>
       <div class="puz-btns">
         <button onclick="showHint()">Hint</button>
+        <button id="muteBtn" onclick="toggleMute()">🔊 Sound on</button>
         <button class="solid" id="nextBtn" style="display:none;" onclick="nextPuzzle()">Next →</button>
+        <button class="solid" id="rushBtn" style="display:none;" onclick="startRush()">Play Rush Again →</button>
       </div>
     </div>
     <div class="card" style="max-width:560px;margin:26px auto 0;">
@@ -438,6 +454,19 @@
       <table id="topTable"><thead><tr><th>#</th><th>Player</th><th>Level</th><th>Score</th></tr></thead><tbody id="topBody"><tr><td colspan="4" style="color:var(--muted);">Loading...</td></tr></tbody></table>
       <p id="yourBest" style="margin-top:10px;font-size:.88rem;"></p>
     </div>
+    <div class="card" style="max-width:560px;margin:16px auto 0;">
+      <div class="num">RUSH TOP 10 — 60 SECONDS</div>
+      <h3>Fastest rushers</h3>
+      <table id="topTable"><thead><tr><th>#</th><th>Player</th><th>Solved</th><th>Score</th></tr></thead><tbody id="rushBody"><tr><td colspan="4" style="color:var(--muted);">Loading...</td></tr></tbody></table>
+      <p id="rushBest" style="margin-top:10px;font-size:.88rem;"></p>
+    </div>
+  </section>
+
+  <section id="diary">
+    <div class="kicker">05 — Diary</div>
+    <div class="h2">My chess diary</div>
+    <p class="lead">My journey, in my own words — tournaments, lessons, wins and losses. Tap 👏 to cheer an entry!</p>
+    <div id="diaryList"></div>
   </section>
 
   <section id="reviews">
@@ -581,20 +610,115 @@ function sendMessage(){
   });
 }
 loadMsgs();
-// Fast videos: load YouTube only when tapped (saves mobile data + speed)
+// Fast videos: tap to play right inside the page (official player = sound works)
+var YTready = false;
+function onYouTubeIframeAPIReady() { YTready = true; }
+function playVid(f, useYT) {
+  var id = f.getAttribute('data-video');
+  if (useYT && window.YT && YT.Player) {
+    try {
+      var holder = document.createElement('div');
+      f.replaceWith(holder);
+      new YT.Player(holder, { width: '100%', height: '200', videoId: id, playerVars: { autoplay: 1, playsinline: 1, rel: 0, modestbranding: 1 }, events: { 'onReady': function (e) { try { e.target.playVideo(); } catch (err) {} } } });
+      return;
+    } catch (err) {}
+  }
+  var iframe = document.createElement('iframe');
+    iframe.src = 'https://www.youtube.com/embed/' + id + '?autoplay=1&playsinline=1&rel=0&modestbranding=1';
+  iframe.title = 'Chess video'; iframe.allowFullscreen = true;
+  iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+  f.replaceWith(iframe);
+}
 document.querySelectorAll('.video-facade').forEach(function(f){
   f.addEventListener('click', function(){
-    var id = f.getAttribute('data-video');
-    var iframe = document.createElement('iframe');
-    iframe.src = 'https://www.youtube.com/embed/' + id + '?autoplay=1';
-    iframe.title = 'Chess video'; iframe.allowFullscreen = true;
-    iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
-    f.replaceWith(iframe);
+    if (YTready) { playVid(f, true); return; }
+    var btn = f.querySelector('button');
+    if (btn) btn.textContent = '…';
+    var waited = 0;
+    var iv = setInterval(function () {
+      waited += 200;
+      if (YTready || waited >= 3000) { clearInterval(iv); playVid(f, YTready); }
+    }, 200);
   });
 });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<script src="https://www.youtube.com/iframe_api"></script>
+<script src="diary.js"></script>
 <script>
+// ===== WINNER EFFECTS: confetti + fanfare + medals + best =====
+function soundMuted() { try { return localStorage.getItem('orly_mute') === '1'; } catch (e) { return false; } }
+function toggleMute() {
+  try { localStorage.setItem('orly_mute', soundMuted() ? '0' : '1'); } catch (e) {}
+  document.getElementById('muteBtn').textContent = soundMuted() ? '🔇 Muted' : '🔊 Sound on';
+}
+function fanfare() {
+  if (soundMuted()) return;
+  try {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    var ctx = new AC();
+    [523.25, 659.25, 783.99, 1046.5].forEach(function (f, i) {
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'triangle'; o.frequency.value = f;
+      var t = ctx.currentTime + i * 0.13;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.25, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.5);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(t); o.stop(t + 0.55);
+    });
+  } catch (e) {}
+}
+function blip() {
+  if (soundMuted()) return;
+  try {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    var ctx = new AC();
+    var o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = 'sine'; o.frequency.value = 880;
+    var t = ctx.currentTime;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.2, t + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.25);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(t); o.stop(t + 0.3);
+  } catch (e) {}
+}
+function boomConfetti() {
+  try {
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  } catch (e) {}
+  var c = document.getElementById('confettiCv');
+  if (!c) {
+    c = document.createElement('canvas');
+    c.id = 'confettiCv';
+    c.style.cssText = 'position:fixed;inset:0;z-index:200;pointer-events:none;';
+    document.body.appendChild(c);
+  }
+  c.width = window.innerWidth; c.height = window.innerHeight;
+  var ctx = c.getContext('2d');
+  var colors = ['#c9a227', '#f9e27d', '#ffffff', '#e9e2d0', '#8c6a00'];
+  var parts = [];
+  for (var i = 0; i < 140; i++) {
+    parts.push({ x: Math.random() * c.width, y: -20 - Math.random() * c.height * 0.3, w: 6 + Math.random() * 6, h: 8 + Math.random() * 8, vy: 2 + Math.random() * 3, vx: -1.5 + Math.random() * 3, r: Math.random() * Math.PI, vr: -0.1 + Math.random() * 0.2, col: colors[i % colors.length] });
+  }
+  var frames = 0;
+  (function tick() {
+    ctx.clearRect(0, 0, c.width, c.height);
+    parts.forEach(function (p) {
+      p.x += p.vx; p.y += p.vy; p.r += p.vr;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r);
+      ctx.fillStyle = p.col; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    });
+    if (++frames < 220) requestAnimationFrame(tick);
+    else ctx.clearRect(0, 0, c.width, c.height);
+  })();
+}
+var MEDALS = ['🥇', '🥈', '🥉'];
+function medal(i) { return MEDALS[i] || (i + 1); }
 // ===== PUZZLE GAME: 10 verified checkmates, speed scoring, top 10 =====
 var PUZZLES = [
   { fen: 'rnbqkbnr/ppppp2p/5p2/6p1/3PP3/8/PPP2PPP/RNBQKBNR w - - 0 1', line: ['d1h5'], par: 'Mate in 1', title: 'Level 1: First Blood', hint: 'The black king never moved. Which square next to it is weak?' },
@@ -609,6 +733,8 @@ var PUZZLES = [
   { fen: 'r2qkbnr/ppp2ppp/2np4/4p2b/2B1P3/2N2N1P/PPPP1PPP/R2QKB1R w - - 0 6', line: ['f3e5', 'h5d1', 'c4f7', 'e8e7', 'c3d5'], par: 'Mate in 3 — the famous Legal Trap', title: 'Level 10: The Famous Trap', hint: 'Give the knight, give the queen... then strike with the bishop!' }
 ];
 var chess = null, selSq = null, dotSq = [], lastFrom = null, lastTo = null;
+var mode = 'normal';
+var rush = { left: 60, score: 0, solved: 0, timer: null, t0: 0 };
 var pz = { i: 0, moveIdx: 0, mistakes: 0, t0: 0, secs: 0, timer: null, total: 0, stars: [], user: null, locked: false, done: false };
 function pzUser() { try { return localStorage.getItem('orly_user') || ''; } catch (e) { return ''; } }
 function fmtTime(s) { return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
@@ -643,6 +769,13 @@ function startGame() {
 }
 function enterGame(u) {
   pz.user = u;
+  mode = 'normal';
+  clearInterval(rush.timer);
+  document.getElementById('pillTime').style.color = '';
+  document.getElementById('rushBtn').style.display = 'none';
+  document.getElementById('modeNormal').className = 'solid';
+  document.getElementById('modeRush').className = '';
+  document.getElementById('levelDots').style.display = 'flex';
   document.getElementById('pillUser').textContent = u;
   document.getElementById('gateBox').style.display = 'none';
   document.getElementById('gameBox').style.display = 'block';
@@ -677,7 +810,7 @@ function loadPuzzle(i) {
   pz.timer = setInterval(function () {
     if (pz.done) return;
     pz.secs = Math.floor((Date.now() - pz.t0) / 1000);
-    document.getElementById('pillTime').textContent = fmtTime(pz.secs);
+    if (mode === 'normal') document.getElementById('pillTime').textContent = fmtTime(pz.secs);
   }, 500);
 }
 function renderPuzBoard() {
@@ -753,12 +886,18 @@ function attemptPuzMove(f, t) {
     pz.mistakes++;
     selSq = null; dotSq = [];
     renderPuzBoard();
-    setPuzMsg('Not quite — look for the mating move! Try again. (mistakes: ' + pz.mistakes + ')');
+    if (mode === 'rush') {
+      rush.t0 -= 5000;
+      setPuzMsg('Wrong! -5 seconds! Try again.');
+    } else {
+      setPuzMsg('Not quite — look for the mating move! Try again. (mistakes: ' + pz.mistakes + ')');
+    }
   }
 }
 function puzzleSolved() {
   pz.done = true;
   clearInterval(pz.timer);
+  if (mode === 'rush') { rushSolved(); return; }
   var level = pz.i + 1;
   var stars = 3;
   if (pz.mistakes > 2) stars--;
@@ -771,6 +910,15 @@ function puzzleSolved() {
   var dot = document.getElementById('dot' + pz.i);
   if (dot) { dot.classList.add('done'); dot.textContent = stars; }
   setPuzMsg('Checkmate in ' + fmtTime(pz.secs) + '! +' + pts + ' points ' + '★'.repeat(stars) + ' Nice!');
+  fanfare();
+  boomConfetti();
+  var prevBest = 0;
+  try { prevBest = parseInt(localStorage.getItem('orly_best') || '0', 10); } catch (e) {}
+  if (pz.total > prevBest) {
+    try { localStorage.setItem('orly_best', String(pz.total)); } catch (e) {}
+    var bb = document.getElementById('bestBanner');
+    if (bb) { bb.style.display = 'block'; setTimeout(function () { bb.style.display = 'none'; }, 2500); }
+  }
   saveScore();
   var nb = document.getElementById('nextBtn');
   nb.style.display = 'none';
@@ -802,7 +950,110 @@ function solverTitle(s) {
   if (s >= 800) return 'Knight Rider';
   return 'Pawn Pusher';
 }
-function nextPuzzle() { loadPuzzle(pz.i + 1); }
+function nextPuzzle() { if (mode === 'normal') loadPuzzle(pz.i + 1); }
+// ===== RUSH MODE: 60 seconds, as many mates as you can =====
+function setMode(m) {
+  clearInterval(rush.timer);
+  clearInterval(pz.timer);
+  document.getElementById('pillTime').style.color = '';
+  document.getElementById('rushBtn').style.display = 'none';
+  if (m === 'rush') {
+    mode = 'rush';
+    document.getElementById('modeRush').className = 'solid';
+    document.getElementById('modeNormal').className = '';
+    startRush();
+  } else {
+    mode = 'normal';
+    document.getElementById('modeNormal').className = 'solid';
+    document.getElementById('modeRush').className = '';
+    document.getElementById('levelDots').style.display = 'flex';
+    pz.total = 0;
+    document.getElementById('pillScore').textContent = '0';
+    document.getElementById('pillTime').style.color = '';
+    buildDots();
+    loadPuzzle(0);
+  }
+}
+function startRush() {
+  mode = 'rush';
+  document.getElementById('modeRush').className = 'solid';
+  document.getElementById('modeNormal').className = '';
+  document.getElementById('rushBtn').style.display = 'none';
+  document.getElementById('levelDots').style.display = 'none';
+  rush.score = 0; rush.solved = 0; rush.left = 60;
+  document.getElementById('pillScore').textContent = '0';
+  var idx = Math.floor(Math.random() * 10);
+  loadPuzzle(idx);
+  document.getElementById('pillLevel').textContent = 'Rush';
+  clearInterval(rush.timer);
+  rush.t0 = Date.now();
+  rush.timer = setInterval(function () {
+    rush.left = 60 - Math.floor((Date.now() - rush.t0) / 1000);
+    var pt = document.getElementById('pillTime');
+    pt.textContent = fmtTime(Math.max(0, rush.left));
+    pt.style.color = rush.left <= 10 ? '#ff5a5a' : '';
+    if (rush.left <= 0) endRush();
+  }, 250);
+}
+function rushSolved() {
+  var pts = 100 + Math.max(0, (30 - pz.secs) * 5);
+  rush.score += pts;
+  rush.solved++;
+  document.getElementById('pillScore').textContent = rush.score;
+  blip();
+  setPuzMsg('Solved +' + pts + '! (' + rush.solved + ' done)');
+  saveRush();
+  setTimeout(function () {
+    if (mode !== 'rush') return;
+    var n;
+    do { n = Math.floor(Math.random() * 10); } while (n === pz.i);
+    loadPuzzle(n);
+    document.getElementById('pillLevel').textContent = 'Rush';
+  }, 500);
+}
+function endRush() {
+  clearInterval(rush.timer);
+  clearInterval(pz.timer);
+  pz.done = true; pz.locked = true;
+  document.getElementById('pillTime').textContent = '0:00';
+  document.getElementById('pillTime').style.color = '';
+  fanfare();
+  boomConfetti();
+  var prev = 0;
+  try { prev = parseInt(localStorage.getItem('orly_rush_best') || '0', 10); } catch (e) {}
+  var nb = '';
+  if (rush.score > prev) {
+    try { localStorage.setItem('orly_rush_best', String(rush.score)); } catch (e) {}
+    nb = ' 🎉 NEW BEST!';
+  }
+  setPuzMsg('TIME! You solved ' + rush.solved + ' puzzles for ' + rush.score + ' points!' + nb);
+  document.getElementById('rushBtn').style.display = 'inline-block';
+  loadRush();
+}
+function saveRush() {
+  fetch(API_BASE + '/api/rush', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: pz.user, token: pzToken(), score: rush.score, solved: rush.solved })
+  }).then(function () { loadRush(); }).catch(function () {});
+}
+function loadRush() {
+  fetch(API_BASE + '/api/rush').then(function (r) { return r.json(); }).then(function (top) {
+    var tb = document.getElementById('rushBody');
+    if (!top.length) { tb.innerHTML = '<tr><td colspan="4" style="color:var(--muted);">No rush scores yet — be the first!</td></tr>'; }
+    else {
+      tb.innerHTML = top.map(function (row, i) {
+        var me = pz.user && row.name === pz.user ? ' class="me"' : '';
+        return '<tr' + me + '><td>' + medal(i) + '</td><td>' + esc(row.name) + '</td><td>' + row.solved + '</td><td>' + row.score + '</td></tr>';
+      }).join('');
+    }
+    var best = 0;
+    try { best = parseInt(localStorage.getItem('orly_rush_best') || '0', 10); } catch (e) {}
+    document.getElementById('rushBest').textContent = best ? 'Your rush best: ' + best : '';
+  }).catch(function () {
+    document.getElementById('rushBody').innerHTML = '<tr><td colspan="4" style="color:var(--muted);">Rush top needs internet.</td></tr>';
+  });
+}
 function saveScore() {
   fetch(API_BASE + '/api/scores', {
     method: 'POST',
@@ -817,7 +1068,7 @@ function loadTop() {
     else {
       tb.innerHTML = top.map(function (row, i) {
         var me = pz.user && row.name === pz.user ? ' class="me"' : '';
-        return '<tr' + me + '><td>' + (i + 1) + '</td><td>' + esc(row.name) + '</td><td>' + row.level + '</td><td>' + row.score + '</td></tr>';
+        return '<tr' + me + '><td>' + medal(i) + '</td><td>' + esc(row.name) + '</td><td>' + row.level + '</td><td>' + row.score + '</td></tr>';
       }).join('');
     }
     document.getElementById('yourBest').textContent = 'Your total this run: ' + pz.total + ' — ' + solverTitle(pz.total);
@@ -826,8 +1077,49 @@ function loadTop() {
   });
 }
 (function () {
-  loadTop();
+  try {
+    if (soundMuted()) document.getElementById('muteBtn').textContent = '🔇 Muted';
+    loadTop();
+    loadRush();
+    loadDiary();
+  } catch (e) {}
 })();
+// ===== DIARY: Orly's entries + shared cheers =====
+function loadDiary() {
+  var entries = (typeof DIARY !== 'undefined' && DIARY instanceof Array) ? DIARY.slice().reverse() : [];
+  var box = document.getElementById('diaryList');
+  if (!entries.length) { box.innerHTML = '<div class="card"><p>Diary coming soon!</p></div>'; return; }
+  fetch(API_BASE + '/api/cheers').then(function (r) { return r.json(); }).then(function (counts) {
+    renderDiary(entries, counts || {});
+  }).catch(function () { renderDiary(entries, {}); });
+}
+function renderDiary(entries, counts) {
+  var box = document.getElementById('diaryList');
+  box.innerHTML = entries.map(function (e, ri) {
+    var idx = DIARY.length - 1 - ri; // original index (stable for cheers)
+    var c = counts[String(idx)] || 0;
+    var cheered = false;
+    try { cheered = localStorage.getItem('orly_cheered_' + idx) === '1'; } catch (err) {}
+    return '<div class="diary-entry"><small>' + esc(e.date) + '</small><h3>' + esc(e.title) + '</h3><p>' + esc(e.text) + '</p>'
+      + '<button class="cheer-btn" onclick="cheer(' + idx + ')">👏 <span id="cheer' + idx + '">' + c + '</span>' + (cheered ? ' • cheered!' : '') + '</button></div>';
+  }).join('');
+}
+function cheer(idx) {
+  try {
+    if (localStorage.getItem('orly_cheered_' + idx) === '1') return;
+  } catch (e) {}
+  fetch(API_BASE + '/api/cheer', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: idx })
+  }).then(function (r) { return r.json(); }).then(function (res) {
+    if (res && typeof res.count === 'number') {
+      try { localStorage.setItem('orly_cheered_' + idx, '1'); } catch (e) {}
+      var el = document.getElementById('cheer' + idx);
+      if (el) el.textContent = res.count;
+    }
+  }).catch(function () {});
+}
 // 30-second inspiring intro ad mentioning Orly
 var adLines = [
   "Every master was once a beginner.",
