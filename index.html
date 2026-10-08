@@ -262,11 +262,15 @@
   #adTimer { color:var(--muted); font-size:.85rem; }
   #adBtns { display:flex; gap:10px; justify-content:center; margin-top:16px; flex-wrap:wrap; }
   #adBtns button, #adBtns a { padding:12px 22px; border-radius:6px; font-size:.93rem; cursor:pointer; text-decoration:none; border:1px solid var(--line); }
-  #skipAd { background:transparent; color:var(--muted); display:none; }
-  #enterAd { background:var(--gold); color:#111; font-weight:700; border-color:var(--gold); display:none; }
+  #skipAd { display:none !important; }
+  #enterAd { background:var(--gold); color:#111; font-weight:700; border-color:var(--gold); display:none; animation:enterPulse 1.2s ease-in-out infinite; }
+  @keyframes enterPulse { 0%,100%{transform:scale(1); box-shadow:0 0 0 rgba(201,162,39,0);} 50%{transform:scale(1.06); box-shadow:0 0 22px rgba(201,162,39,.7);} }
   #introAd { overflow:hidden; overflow-y:auto; }
   #introAd .ad-box { position:relative; z-index:2; }
-  .ad-photo { width:100%; max-width:280px; border-radius:10px; border:1px solid var(--gold); display:block; margin:0 auto 10px; box-shadow:0 10px 30px rgba(0,0,0,.6); }
+  .ad-photo { width:100%; max-width:280px; border-radius:10px; border:1px solid var(--gold); display:block; margin:0 auto 10px; box-shadow:0 10px 30px rgba(0,0,0,.6); animation:photoZoom 30s ease forwards; }
+  @keyframes photoZoom { from{transform:scale(1);} to{transform:scale(1.12);} }
+  #adMove { color:var(--gold); font-size:.9rem; min-height:22px; margin-top:8px; letter-spacing:.04em; }
+  #adHook { color:#fff; font-size:.85rem; margin-top:6px; opacity:.85; }
   .ad-floats { position:absolute; inset:0; z-index:1; pointer-events:none; overflow:hidden; }
   .ad-floats span { position:absolute; bottom:-12%; color:var(--gold); opacity:.22; animation:adRise linear infinite; }
   @keyframes adRise { from{ transform:translateY(0) rotate(0deg); } to{ transform:translateY(-130vh) rotate(360deg); } }
@@ -306,17 +310,19 @@
     <span style="left:88%; font-size:2.2rem; animation-duration:16s; animation-delay:-8s;">♞</span>
   </div>
   <div class="ad-box">
-    <div class="ad-kicker">A 30-second message before you enter</div>
+    <div class="ad-kicker">Don't skip — mate in 30 seconds ♞</div>
     <div class="ad-main">
       <img class="ad-board-photo" src="pieces.jpg" alt="3D chess board with black and white pieces">
       <div class="ad-right">
         <img class="ad-photo" src="chess.jpg" alt="Glossy black and ivory chess pieces">
-        <div id="adText">Every master was once a beginner.</div>
+        <div id="adText">White to move. Can you see the trap?</div>
+        <div id="adMove">1. ...</div>
+        <div id="adHook">Stay — secret puzzle unlocks at the end.</div>
       </div>
     </div>
     <div id="adBarWrap"><div id="adBar"></div></div>
     <div id="adTimer">Entering in 30s…</div>
-    <div id="adBtns"><button id="skipAd" onclick="closeAd()">Skip Ad →</button><a id="enterAd" href="#" onclick="closeAd();return false;">Enter My Site →</a></div>
+    <div id="adBtns"><button id="skipAd" onclick="closeAd()" style="display:none;">Skip Ad →</button><a id="enterAd" href="#" onclick="closeAd();return false;">🔓 Enter — claim secret puzzle →</a></div>
   </div>
 </div>
 <script>
@@ -1191,14 +1197,15 @@ function cheer(idx) {
     }
   }).catch(function () {});
 }
-// 30-second inspiring intro ad mentioning Orly
+// 30-second inspiring intro ad mentioning Orly - hook, no skip, reward ending
 var adLines = [
-  "Every master was once a beginner.",
-  "You don't need talent. You need one good move a day.",
-  "Watch. Practice. Play. Repeat.",
-  "I am Orly Carl Castillano. Elo 1699. I study every day.",
-  "I can help you become a good chess player. Enter, learn, challenge me."
+  "White to move. Can you see the trap?",
+  "He gave a knight... then his queen. Crazy?",
+  "Bxf7+! The king must run. Nd5... CHECKMATE.",
+  "I am Orly Carl Castillano. Elo 1699. I play this trap.",
+  "Enter now — secret puzzle + challenge me. Don't blink."
 ];
+var adMoves = ["1. Nxe5?", "2. Qxd1??", "3. Bxf7+ Ke7", "4. Nd5#", "✔ You solved it!"];
 var adTotal = 30, adShown = 0, adIdx = 0;
 function closeAd(){ document.getElementById('introAd').classList.add('hidden'); }
 // Knight demo: gold highlight hops empty squares like a real knight (g1-f3-e5-c6-d4-f5-h4-f3...)
@@ -1217,15 +1224,16 @@ setInterval(function(){
   adShown++;
   document.getElementById('adBar').style.width = Math.min(100, adShown/adTotal*100) + '%';
   var left = adTotal - adShown;
-  document.getElementById('adTimer').textContent = left > 0 ? 'Entering in ' + left + 's…' : 'Welcome in!';
-  if(adShown >= 5) document.getElementById('skipAd').style.display = 'inline-block';
-  if(adShown >= 20) document.getElementById('enterAd').style.display = 'inline-block';
+  document.getElementById('adTimer').textContent = left > 0 ? 'Secret unlocks in ' + left + 's… stay!' : 'Unlocked! Enter now!';
+  if(adShown >= 25) document.getElementById('enterAd').style.display = 'inline-block';
   var nextIdx = Math.min(adLines.length-1, Math.floor(adShown/6));
   if(nextIdx !== adIdx){
     adIdx = nextIdx;
     var t = document.getElementById('adText');
     t.textContent = adLines[adIdx];
     t.classList.remove('fade'); void t.offsetWidth; t.classList.add('fade');
+    var mv = document.getElementById('adMove');
+    if(mv) mv.textContent = adMoves[adIdx] || '';
   }
   if(adShown % 2 === 0) moveKnightHint();
   if(adShown >= adTotal) closeAd();
