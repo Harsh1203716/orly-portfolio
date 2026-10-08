@@ -578,7 +578,9 @@ function copyLink() {
   document.getElementById('fbShare').href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(link);
 }
 // Reviews: ONE shared public guestbook for all phones + computers
-var API_BASE = window.location.href.startsWith('http') ? '' : 'http://localhost:8080';
+// On your public GitHub link, use your Render backend so everyone shares Top/scores/visits.
+var RENDER_API = 'https://orly-portfolio.onrender.com';
+var API_BASE = window.location.hostname.indexOf('github.io') >= 0 ? RENDER_API : (window.location.href.startsWith('http') ? '' : 'http://localhost:8080');
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function getLocal(){ try{ return JSON.parse(localStorage.getItem('orly_msgs') || '[]'); }catch(e){ return []; } }
 function setLocal(msgs){ try{ localStorage.setItem('orly_msgs', JSON.stringify(msgs.slice(0,50))); }catch(e){} }
