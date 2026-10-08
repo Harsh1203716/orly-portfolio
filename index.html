@@ -521,6 +521,11 @@ try {
         <button class="send" onclick="signVisit()">I Visited →</button>
       </div>
       <div id="visitStatus"></div>
+      <div id="ownerVisits" style="display:none;margin-top:18px;text-align:left;max-width:560px;margin-left:auto;margin-right:auto;">
+        <h3 style="color:var(--gold);font-size:1rem;">Owner only — recent 5 visits</h3>
+        <p style="font-size:.8rem;color:var(--muted);">Private. Only shows when you open with ?owner=1.</p>
+        <div id="visitList" style="display:flex;flex-direction:column;gap:8px;margin-top:8px;"></div>
+      </div>
     </div>
   </section>
 
@@ -645,10 +650,34 @@ function signVisit(){
     document.getElementById('visitFb').value = '';
     document.getElementById('visitEmail').value = '';
     st.textContent = 'Thanks! Orly sees you visited. Private — not shown to others.';
+    try { loadOwnerVisits(); } catch (e) {}
   }).catch(function(){
     st.textContent = 'Need internet / server online to save. On GitHub link it will not save — use the live server link.';
   });
 }
+function loadOwnerVisits(){
+  var box = document.getElementById('ownerVisits');
+  if(!box) return;
+  var isOwner = window.location.search.indexOf('owner=1') >= 0 || window.location.hash.indexOf('owner') >= 0;
+  if(!isOwner) return;
+  box.style.display = 'block';
+  fetch(API_BASE + '/api/visitors').then(function(r){ return r.json(); }).then(function(v){
+    var list = document.getElementById('visitList');
+    v = (v || []).slice(0, 5);
+    if(!v.length){ list.innerHTML = '<div style="color:var(--muted);font-size:.85rem;">No visits yet.</div>'; return; }
+    list.innerHTML = v.map(function(x, i){
+      return '<div style="border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:.85rem;">'
+        + '<b>#' + (i+1) + ' ' + esc(x.name || '-') + '</b> <span style="color:var(--muted);">' + esc(x.date || '') + '</span><br>'
+        + (x.fb ? 'FB: <a href="' + esc(x.fb) + '" target="_blank" rel="noopener">' + esc(x.fb) + '</a><br>' : '')
+        + (x.email ? 'Email: ' + esc(x.email) + '<br>' : '')
+        + '<span style="color:var(--muted);font-size:.78rem;">ip: ' + esc(x.ip || '') + '</span></div>';
+    }).join('');
+  }).catch(function(){
+    document.getElementById('visitList').innerHTML = '<div style="color:var(--muted);font-size:.85rem;">Need server online to load.</div>';
+    box.style.display = 'block';
+  });
+}
+try { loadOwnerVisits(); } catch (e) {}
 loadMsgs();
 // Fast videos: tap to play right inside the page (official player = sound works)
 var YTready = false;
