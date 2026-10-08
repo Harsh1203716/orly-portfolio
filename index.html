@@ -510,6 +510,20 @@ try {
     </div>
   </section>
 
+  <section id="visitors">
+    <div class="contact">
+      <h2>You visited? Sign here</h2>
+      <p>Leave your name so Orly knows you came. Facebook + email are optional and private — only Orly sees them, not other visitors.</p>
+      <div class="msg-form">
+        <input id="visitName" maxlength="60" placeholder="Your name * (required)">
+        <input id="visitFb" maxlength="200" placeholder="Facebook link (optional)">
+        <input id="visitEmail" maxlength="100" placeholder="Email (optional)">
+        <button class="send" onclick="signVisit()">I Visited →</button>
+      </div>
+      <div id="visitStatus"></div>
+    </div>
+  </section>
+
   <section id="contact">
     <div class="contact">
       <h2>Let's play a game</h2>
@@ -612,6 +626,27 @@ try { loadMsgs(); } catch (e) {}
     document.getElementById('msgText').value = '';
     status.textContent = 'Posted on this device (offline mode).';
     renderMsgs(msgs);
+  });
+}
+function signVisit(){
+  var n = document.getElementById('visitName').value.trim();
+  var fb = document.getElementById('visitFb').value.trim();
+  var em = document.getElementById('visitEmail').value.trim();
+  var st = document.getElementById('visitStatus');
+  if(!n){ st.textContent = 'Please type your name first.'; return; }
+  if(em && (em.indexOf('@') < 0 || em.indexOf('.') < 0)){ st.textContent = 'That email looks wrong.'; return; }
+  st.textContent = 'Saving...';
+  fetch(API_BASE + '/api/visit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: n.slice(0,60), fb: fb.slice(0,200), email: em.slice(0,100) })
+  }).then(function(r){ if(!r.ok) throw 0; return r.json(); }).then(function(){
+    document.getElementById('visitName').value = '';
+    document.getElementById('visitFb').value = '';
+    document.getElementById('visitEmail').value = '';
+    st.textContent = 'Thanks! Orly sees you visited. Private — not shown to others.';
+  }).catch(function(){
+    st.textContent = 'Need internet / server online to save. On GitHub link it will not save — use the live server link.';
   });
 }
 loadMsgs();
